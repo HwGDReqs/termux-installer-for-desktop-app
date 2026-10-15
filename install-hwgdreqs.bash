@@ -40,13 +40,7 @@ proot-distro login --shared-tmp ubuntu -- \
         apt update
         apt upgrade -y
 
-        apt install -y \
-            python3 \
-            python3-pip \
-            python3-venv \
-            xfwm4 \
-            x11-apps \
-            libxcb-cursor0
+        apt install -y python3 python3-pip python3-venv xfwm4 x11-apps libxcb-cursor0 libxkbcommon-x11-0  libglib2.0-0 libgl1 libegl1 libxkbcommon0 libdbus-1-3 libfontconfig1 libfreetype6 libx11-xcb1 libcairo2 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-sync1 libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxrender1 libxi6 libsm6 libice6
 
         python3 -m venv /opt/hwgdreqs-venv
 
@@ -61,7 +55,7 @@ cat > "$HOME/.local/bin/run-hwgdreqs" <<'LAUNCHER'
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-DISPLAY=:0
+DISPLAY=:1
 export DISPLAY
 
 WM_PID=""
@@ -118,8 +112,8 @@ am start --user 0 \
     -n com.termux.x11/com.termux.x11.MainActivity
 
 # Start the Ubuntu window manager
-proot-distro login --shared-tmp ubuntu -- \
-    bash -lc 'export DISPLAY=:0; exec xfwm4' &
+proot-distro login ubuntu --bind /data/data/com.termux/files/usr/tmp/.X11-unix:/tmp/.X11-unix -- \
+    bash -lc 'export DISPLAY=:1; exec xfwm4' &
 WM_PID=$!
 
 sleep 1
@@ -128,7 +122,7 @@ sleep 1
 echo "Launching HwGDReqs..."
 
 proot-distro login --shared-tmp ubuntu -- \
-    bash -lc 'export DISPLAY=:0; exec /opt/hwgdreqs-venv/bin/hwgdreqs' &
+    bash -lc 'export DISPLAY=:1; exec /opt/hwgdreqs-venv/bin/hwgdreqs' &
 APP_PID=$!
 
 wait "$APP_PID"
